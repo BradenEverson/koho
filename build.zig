@@ -2,7 +2,7 @@ const builtin = @import("builtin");
 const std = @import("std");
 
 pub fn build(b: *std.Build) void {
-    const exe_name = "zree_rtos";
+    const exe_name = "koho";
 
     // Target
     const query: std.Target.Query = .{
