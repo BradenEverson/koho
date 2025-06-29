@@ -14,7 +14,6 @@ export fn stepper_task(params: ?*anyopaque) callconv(.c) void {
     _ = params;
 
     while (true) {
-        c.HAL_GPIO_TogglePin(c.LD2_GPIO_Port, c.LD2_Pin);
         c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_9, c.GPIO_PIN_SET);
 
         c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_8, c.GPIO_PIN_SET);
