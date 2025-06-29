@@ -42,7 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
-extern void zigEntrypoint(void);
+extern void entry(void);
 
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -99,7 +99,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  zigEntrypoint();
+  entry();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

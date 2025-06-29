@@ -10,36 +10,41 @@ const os = @cImport({
     @cInclude("task.h");
 });
 
-export fn zig_task(params: ?*anyopaque) callconv(.c) void {
+export fn stepper_task(params: ?*anyopaque) callconv(.c) void {
     _ = params;
 
     while (true) {
-        c.HAL_GPIO_TogglePin(c.LD2_GPIO_Port, c.LD2_Pin);
-        os.vTaskDelay(100);
+        c.HAL_GPIO_WritePin(c.GPIOA, c.GPIO_PIN_2, c.GPIO_PIN_SET);
+
+        c.HAL_GPIO_WritePin(c.GPIOA, c.GPIO_PIN_3, c.GPIO_PIN_SET);
+        os.vTaskDelay(1);
+        c.HAL_GPIO_WritePin(c.GPIOA, c.GPIO_PIN_3, c.GPIO_PIN_RESET);
+        os.vTaskDelay(1);
     }
 }
 
-export fn zigEntrypoint() callconv(.c) void {
+export fn entry() callconv(.c) void {
+    var step_pin: c.GPIO_InitTypeDef = .{
+        .Pin = c.GPIO_PIN_3,
+        .Mode = c.GPIO_MODE_OUTPUT_PP,
+        .Pull = c.GPIO_NOPULL,
+        .Speed = c.GPIO_SPEED_FREQ_HIGH,
+    };
+    c.HAL_GPIO_Init(c.GPIOA, &step_pin);
 
-    // Temporary task to initialize the system
+    var dir_pin: c.GPIO_InitTypeDef = .{
+        .Pin = c.GPIO_PIN_2,
+        .Mode = c.GPIO_MODE_OUTPUT_PP,
+        .Pull = c.GPIO_NOPULL,
+        .Speed = c.GPIO_SPEED_FREQ_HIGH,
+    };
+    c.HAL_GPIO_Init(c.GPIOA, &dir_pin);
+
+    // Create FreeRTOS task
     const pvParameters: ?*anyopaque = null;
     const pxCreatedTask: ?*os.TaskHandle_t = null;
-    _ = os.xTaskCreate(zig_task, "Blinky", 256, pvParameters, 15, pxCreatedTask);
-    // Start application
+    _ = os.xTaskCreate(stepper_task, "stepper", 256, pvParameters, 15, pxCreatedTask);
+
     os.vTaskStartScheduler();
-
     unreachable;
-}
-
-// Custom debug Panic implementation that will be used to print on UART.
-pub const panic = std.debug.FullPanic(myPanic);
-
-fn myPanic(msg: []const u8, first_trace_addr: ?usize) noreturn {
-    // `_disable_irq()` is demoted to extern but don't work. Maybe because it is was a "static inline" function. Need investigation
-    asm volatile ("cpsid i" ::: "memory");
-
-    //Start printing, ensure error is impossible or ignore it. We are already on an error state.
-    _ = msg;
-    _ = first_trace_addr;
-    while (true) {}
 }
