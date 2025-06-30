@@ -10,35 +10,20 @@ const os = @cImport({
     @cInclude("task.h");
 });
 
+const Stepper = @import("stepper.zig");
+
+var stepper: Stepper = undefined;
+
 export fn stepper_task(params: ?*anyopaque) callconv(.c) void {
     _ = params;
 
     while (true) {
-        c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_9, c.GPIO_PIN_SET);
-
-        c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_8, c.GPIO_PIN_SET);
-        os.vTaskDelay(100);
-        c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_8, c.GPIO_PIN_RESET);
-        os.vTaskDelay(100);
+        stepper.step();
     }
 }
 
 export fn entry() callconv(.c) void {
-    var step_pin: c.GPIO_InitTypeDef = .{
-        .Pin = c.GPIO_PIN_8,
-        .Mode = c.GPIO_MODE_OUTPUT_PP,
-        .Pull = c.GPIO_NOPULL,
-        .Speed = c.GPIO_SPEED_FREQ_HIGH,
-    };
-    c.HAL_GPIO_Init(c.GPIOC, &step_pin);
-
-    var dir_pin: c.GPIO_InitTypeDef = .{
-        .Pin = c.GPIO_PIN_9,
-        .Mode = c.GPIO_MODE_OUTPUT_PP,
-        .Pull = c.GPIO_NOPULL,
-        .Speed = c.GPIO_SPEED_FREQ_HIGH,
-    };
-    c.HAL_GPIO_Init(c.GPIOC, &dir_pin);
+    stepper = Stepper.init(c.GPIOC, c.GPIO_PIN_8, c.GPIOC, c.GPIO_PIN_9);
 
     // Create FreeRTOS task
     const pvParameters: ?*anyopaque = null;
