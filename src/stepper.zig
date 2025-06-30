@@ -12,12 +12,17 @@ const os = @cImport({
     @cInclude("task.h");
 });
 
+/// The current direction the stepper is moving
 pub const Direction = enum { Clockwise, CounterClockwise };
 
+/// The GPIO Port for the Step control pin
 step_port: [*c]c.GPIO_TypeDef,
+/// The GPIO pin for the Step control pin
 step_pin: u16,
 
+/// The GPIO Port for the direction control pin
 dir_port: [*c]c.GPIO_TypeDef,
+/// The GPIO pin for the direction control pin
 dir_pin: u16,
 
 // TODO: Find out what defualt direction is
@@ -25,6 +30,8 @@ dir_pin: u16,
 
 const Self = @This();
 
+/// Initializes the stepper motor with respect to the
+/// step and direction pins
 pub fn init(
     step_port: [*c]c.GPIO_TypeDef,
     step_pin: u16,
@@ -55,14 +62,21 @@ pub fn init(
     };
 }
 
+/// Cleans up the pins bound to the stepper motor
 pub fn deinit(self: *Self) void {
     c.HAL_GPIO_DeInit(self.dir_port, self.dir_pin);
     c.HAL_GPIO_DeInit(self.step_port, self.step_pin);
 }
 
+/// Complete a single step
 pub fn step(self: *Self) void {
     c.HAL_GPIO_WritePin(self.step_port, self.step_pin, c.GPIO_PIN_SET);
     os.vTaskDelay(1);
     c.HAL_GPIO_WritePin(self.step_port, self.step_pin, c.GPIO_PIN_RESET);
     os.vTaskDelay(1);
+}
+
+/// Swap the direction we're moving
+pub fn swap_dir(self: *Self) void {
+    c.HAL_GPIO_TogglePin(self.dir_port, self.dir_pin);
 }
