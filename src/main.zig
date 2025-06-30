@@ -17,9 +17,9 @@ export fn stepper_task(params: ?*anyopaque) callconv(.c) void {
         c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_9, c.GPIO_PIN_SET);
 
         c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_8, c.GPIO_PIN_SET);
-        os.vTaskDelay(1);
+        os.vTaskDelay(100);
         c.HAL_GPIO_WritePin(c.GPIOC, c.GPIO_PIN_8, c.GPIO_PIN_RESET);
-        os.vTaskDelay(1);
+        os.vTaskDelay(100);
     }
 }
 
@@ -30,7 +30,7 @@ export fn entry() callconv(.c) void {
         .Pull = c.GPIO_NOPULL,
         .Speed = c.GPIO_SPEED_FREQ_HIGH,
     };
-    c.HAL_GPIO_Init(c.GPIOA, &step_pin);
+    c.HAL_GPIO_Init(c.GPIOC, &step_pin);
 
     var dir_pin: c.GPIO_InitTypeDef = .{
         .Pin = c.GPIO_PIN_9,
