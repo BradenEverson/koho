@@ -25,6 +25,8 @@ dir_port: [*c]c.GPIO_TypeDef,
 /// The GPIO pin for the direction control pin
 dir_pin: u16,
 
+steps: u64,
+
 // TODO: Find out what defualt direction is
 // direction: Direction
 
@@ -59,6 +61,7 @@ pub fn init(
         .step_pin = step_pin,
         .dir_port = dir_port,
         .dir_pin = dir_pin,
+        .steps = 0,
     };
 }
 
@@ -70,10 +73,14 @@ pub fn deinit(self: *Self) void {
 
 /// Complete a single step
 pub fn step(self: *Self) void {
+    if (self.steps % 500 == 0) {
+        c.HAL_GPIO_TogglePin(self.dir_port, self.dir_pin);
+    }
     c.HAL_GPIO_WritePin(self.step_port, self.step_pin, c.GPIO_PIN_SET);
     os.vTaskDelay(1);
     c.HAL_GPIO_WritePin(self.step_port, self.step_pin, c.GPIO_PIN_RESET);
     os.vTaskDelay(1);
+    self.steps += 1;
 }
 
 /// Swap the direction we're moving
