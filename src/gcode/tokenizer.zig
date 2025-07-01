@@ -1,6 +1,36 @@
 //! GCODE Tokenizer that will convert the flat file into a list of commands
 
-const Token = @import("tokens.zig").Token;
-const TokenTag = @import("tokens.zig").TokenTag;
+const std = @import("std");
 
-buf: []const u8,
+pub const TokenTag = enum(u16) {
+    g_command,
+    m_command,
+    t_command,
+
+    axis_param,
+    param_value,
+
+    integer,
+    float,
+
+    comment,
+    newline,
+    whitespace,
+
+    semicolon,
+    paren_open,
+    paren_close,
+    asterisk,
+
+    variable,
+    operator,
+    function,
+};
+
+pub const Token = struct {
+    tag: TokenTag,
+    idx: u32,
+    len: u16,
+};
+
+pub fn tokenize() !void {}
