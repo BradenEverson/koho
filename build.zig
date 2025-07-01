@@ -324,6 +324,25 @@ pub fn build(b: *std.Build) void {
         clean_step.dependOn(&b.addRemoveDirTree(.{ .cwd_relative = b.pathFromRoot(".zig-cache") }).step);
     }
 
+    const exe = b.addExecutable(.{
+        .name = "gcode_test",
+        .root_source_file = b.path("src/gcode_test.zig"),
+        .target = b.graph.host,
+    });
+
+    b.installArtifact(exe);
+
+    const run_cmd = b.addRunArtifact(exe);
+    run_cmd.step.dependOn(b.getInstallStep());
+
+    const run_step = b.step("test", "test the gcode interpreter in a non-embedded context");
+
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    run_step.dependOn(&run_cmd.step);
+
     b.getInstallStep().dependOn(&elf.step);
     b.installArtifact(elf);
 }
