@@ -74,7 +74,7 @@ pub fn deinit(self: *Self) void {
 /// Complete a single step
 pub fn step(self: *Self) void {
     if (self.steps % 500 == 0) {
-        c.HAL_GPIO_TogglePin(self.dir_port, self.dir_pin);
+        self.swap_dir();
     }
     c.HAL_GPIO_WritePin(self.step_port, self.step_pin, c.GPIO_PIN_SET);
     os.vTaskDelay(1);
