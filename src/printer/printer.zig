@@ -1,6 +1,6 @@
 //! All peripherals the printer system needs
 
-const Stepper = @import("stepper.zig");
+const Stepper = @import("../peripherals/stepper.zig");
 
 curr_x: u64,
 curr_y: u64,
