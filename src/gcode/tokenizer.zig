@@ -1,6 +1,7 @@
 //! GCODE Tokenizer that will convert the flat file into a list of commands
 
 const std = @import("std");
+const peekable = @import("peekable.zig");
 
 /// All types a GCODE token can have
 pub const TokenTag = enum(u16) {
@@ -37,6 +38,26 @@ pub const Token = struct {
 
 /// Attempts to tokenize a GCODE stream into a list of tokens, reporting any errors along the way
 pub fn tokenize(stream: []const u8, buf: *std.ArrayList(Token)) !void {
-    _ = stream;
-    _ = buf;
+    var len: u16 = 0;
+    var idx: u32 = 0;
+    var peek = peekable.PeekableIterator(u8){ .buf = stream };
+
+    while (peek.next()) |tok| {
+        len = 1;
+        const next: TokenTag = switch (tok) {
+            'M' => .m_command,
+            'G' => .g_command,
+            'T' => .t_command,
+        };
+
+        const token = Token{
+            .tag = next,
+            .idx = idx,
+            .len = len,
+        };
+
+        try buf.append(token);
+
+        idx += 1;
+    }
 }
