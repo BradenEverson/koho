@@ -23,9 +23,8 @@ const Self = @This();
 pub fn init(port: [*c]c.GPIO_TypeDef, pin: u16, irq_n: c_int) Self {
     var es: c.GPIO_InitTypeDef = .{
         .Pin = pin,
-        .Mode = c.GPIO_MODE_INPUT,
-        .Pull = c.GPIO_NOPULL,
-        .Speed = c.GPIO_SPEED_FREQ_LOW,
+        .Mode = c.GPIO_MODE_IT_FALLING,
+        .Pull = c.GPIO_PULLUP,
     };
 
     c.HAL_GPIO_Init(port, &es);
