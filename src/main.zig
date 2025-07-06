@@ -29,13 +29,9 @@ export fn stepper_task(params: ?*anyopaque) callconv(.c) void {
 }
 
 export fn EXTI1_IRQHandler() callconv(.c) void {
-    if (endstop.triggered) {
-        c.HAL_GPIO_WritePin(c.LD2_GPIO_Port, c.LD2_Pin, c.GPIO_PIN_RESET);
-    } else {
-        c.HAL_GPIO_WritePin(c.LD2_GPIO_Port, c.LD2_Pin, c.GPIO_PIN_SET);
-    }
-
-    endstop.triggered = !endstop.triggered;
+    c.HAL_GPIO_EXTI_IRQHandler(c.GPIO_PIN_1);
+    c.HAL_GPIO_TogglePin(c.LD2_GPIO_Port, c.LD2_Pin);
+    endstop.triggered = true;
 }
 
 export fn entry() callconv(.c) void {
