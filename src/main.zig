@@ -28,10 +28,15 @@ export fn stepper_task(params: ?*anyopaque) callconv(.c) void {
     }
 }
 
+var last_trigger_time: u32 = 0;
 export fn EXTI1_IRQHandler() callconv(.c) void {
+    const now = c.HAL_GetTick();
+    if (now - last_trigger_time > 5) {
+        c.HAL_GPIO_TogglePin(c.LD2_GPIO_Port, c.LD2_Pin);
+        endstop.triggered = true;
+        last_trigger_time = now;
+    }
     c.HAL_GPIO_EXTI_IRQHandler(c.GPIO_PIN_1);
-    c.HAL_GPIO_TogglePin(c.LD2_GPIO_Port, c.LD2_Pin);
-    endstop.triggered = true;
 }
 
 export fn entry() callconv(.c) void {
