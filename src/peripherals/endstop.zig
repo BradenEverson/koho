@@ -23,7 +23,7 @@ const Self = @This();
 pub fn init(port: [*c]c.GPIO_TypeDef, pin: u16, irq_n: c_int) Self {
     var es: c.GPIO_InitTypeDef = .{
         .Pin = pin,
-        .Mode = c.GPIO_MODE_IT_FALLING,
+        .Mode = c.GPIO_MODE_IT_RISING,
         .Pull = c.GPIO_PULLUP,
     };
 
