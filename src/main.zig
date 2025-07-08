@@ -26,6 +26,52 @@ var y_axis: Stepper = undefined;
 var x_endstop: Endstop = undefined;
 var y_endstop: Endstop = undefined;
 
+export fn draw(params: ?*anyopaque) callconv(.c) void {
+    _ = params;
+    while (!x_endstop.triggered and !y_endstop.triggered) {}
+
+    for (0..750) |_| {
+        x_axis.step();
+        y_axis.step();
+    }
+
+    for (0..250) |_| {
+        y_axis.step();
+    }
+
+    x_axis.swap_dir();
+    for (0..250) |_| {
+        x_axis.step();
+    }
+
+    y_axis.swap_dir();
+    for (0..500) |_| {
+        y_axis.step();
+    }
+
+    x_axis.swap_dir();
+    for (0..500) |_| {
+        x_axis.step();
+    }
+
+    y_axis.swap_dir();
+    for (0..500) |_| {
+        y_axis.step();
+    }
+
+    x_axis.swap_dir();
+    for (0..250) |_| {
+        x_axis.step();
+    }
+
+    y_axis.swap_dir();
+    for (0..250) |_| {
+        y_axis.step();
+    }
+
+    while (true) {}
+}
+
 export fn home_x_axis(params: ?*anyopaque) callconv(.c) void {
     _ = params;
 
@@ -34,9 +80,11 @@ export fn home_x_axis(params: ?*anyopaque) callconv(.c) void {
     }
 
     x_axis.swap_dir();
-    for (0..50) |_| {
+    for (0..100) |_| {
         x_axis.step();
     }
+
+    os.vTaskDelete(null);
 }
 
 export fn home_y_axis(params: ?*anyopaque) callconv(.c) void {
@@ -50,6 +98,8 @@ export fn home_y_axis(params: ?*anyopaque) callconv(.c) void {
     for (0..50) |_| {
         y_axis.step();
     }
+
+    os.vTaskDelete(null);
 }
 
 var x_last_trigger_time: u32 = 0;
@@ -84,6 +134,8 @@ export fn entry() callconv(.c) void {
 
     _ = os.xTaskCreate(home_x_axis, "home the x axis", 256, pvParameters, 15, pxCreatedTask);
     _ = os.xTaskCreate(home_y_axis, "home the y axis", 256, pvParameters, 15, pxCreatedTask);
+
+    _ = os.xTaskCreate(draw, "Draw a pretty picture :)", 256, pvParameters, 10, pxCreatedTask);
 
     os.vTaskStartScheduler();
     unreachable;
