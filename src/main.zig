@@ -12,6 +12,8 @@ const os = @cImport({
     @cInclude("task.h");
 });
 
+const Direction = @import("printer/direction.zig").Direction;
+
 const Stepper = @import("peripherals/stepper.zig");
 const Endstop = @import("peripherals/endstop.zig");
 
@@ -23,11 +25,12 @@ const pxCreatedTask: ?*os.TaskHandle_t = null;
 var x_axis: Stepper = undefined;
 var y_axis: Stepper = undefined;
 const z_axis: Stepper = undefined;
+const extruder: Stepper = undefined;
 
 var x_endstop: Endstop = undefined;
 var y_endstop: Endstop = undefined;
 
-var printer = undefined;
+var printer: Printer = undefined;
 
 export fn draw(params: ?*anyopaque) callconv(.c) void {
     _ = params;
@@ -38,39 +41,13 @@ export fn draw(params: ?*anyopaque) callconv(.c) void {
         y_axis.step();
     }
 
-    for (0..250) |_| {
-        y_axis.step();
-    }
-
-    x_axis.swap_dir();
-    for (0..250) |_| {
-        x_axis.step();
-    }
-
-    y_axis.swap_dir();
-    for (0..500) |_| {
-        y_axis.step();
-    }
-
-    x_axis.swap_dir();
-    for (0..500) |_| {
-        x_axis.step();
-    }
-
-    y_axis.swap_dir();
-    for (0..500) |_| {
-        y_axis.step();
-    }
-
-    x_axis.swap_dir();
-    for (0..250) |_| {
-        x_axis.step();
-    }
-
-    y_axis.swap_dir();
-    for (0..250) |_| {
-        y_axis.step();
-    }
+    printer.move_2d(.up, 250);
+    printer.move_2d(.left, 250);
+    printer.move_2d(.down, 500);
+    printer.move_2d(.right, 500);
+    printer.move_2d(.up, 500);
+    printer.move_2d(.left, 250);
+    printer.move_2d(.down, 250);
 
     while (true) {}
 }
@@ -128,6 +105,7 @@ export fn entry() callconv(.c) void {
     _ = os.xTaskCreate(home_x_axis, "home the x axis", 256, pvParameters, 15, pxCreatedTask);
     _ = os.xTaskCreate(home_y_axis, "home the y axis", 256, pvParameters, 15, pxCreatedTask);
 
+    printer = Printer.init(x_axis, y_axis, z_axis, extruder);
     _ = os.xTaskCreate(draw, "Draw a pretty picture :)", 256, pvParameters, 10, pxCreatedTask);
 
     os.vTaskStartScheduler();
