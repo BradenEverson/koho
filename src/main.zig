@@ -22,9 +22,12 @@ const pxCreatedTask: ?*os.TaskHandle_t = null;
 
 var x_axis: Stepper = undefined;
 var y_axis: Stepper = undefined;
+const z_axis: Stepper = undefined;
 
 var x_endstop: Endstop = undefined;
 var y_endstop: Endstop = undefined;
+
+var printer = undefined;
 
 export fn draw(params: ?*anyopaque) callconv(.c) void {
     _ = params;
@@ -102,23 +105,13 @@ export fn home_y_axis(params: ?*anyopaque) callconv(.c) void {
     os.vTaskDelete(null);
 }
 
-var x_last_trigger_time: u32 = 0;
 export fn EXTI0_IRQHandler() callconv(.c) void {
-    const now = c.HAL_GetTick();
-    if (now - x_last_trigger_time > 5) {
-        x_endstop.triggered = true;
-        x_last_trigger_time = now;
-    }
+    x_endstop.callback(&x_endstop);
     c.HAL_GPIO_EXTI_IRQHandler(c.GPIO_PIN_0);
 }
 
-var y_last_trigger_time: u32 = 0;
 export fn EXTI1_IRQHandler() callconv(.c) void {
-    const now = c.HAL_GetTick();
-    if (now - y_last_trigger_time > 5) {
-        y_endstop.triggered = true;
-        y_last_trigger_time = now;
-    }
+    y_endstop.callback(&y_endstop);
     c.HAL_GPIO_EXTI_IRQHandler(c.GPIO_PIN_1);
 }
 

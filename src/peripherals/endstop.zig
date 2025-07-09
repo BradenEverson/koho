@@ -17,6 +17,8 @@ port: [*c]c.GPIO_TypeDef,
 pin: u16,
 /// If the endstop has been triggered
 triggered: bool,
+/// What to do when the endstop is triggered
+callback: *const fn (*Self) void,
 
 const Self = @This();
 
@@ -35,9 +37,14 @@ pub fn init(port: [*c]c.GPIO_TypeDef, pin: u16, irq_n: c_int) Self {
         .port = port,
         .pin = pin,
         .triggered = false,
+        .callback = default_callback,
     };
 }
 
-pub fn callback(self: *Self) void {
+pub fn set_callback(self: *Self, cb: *const fn (*Self) void) void {
+    self.callback = cb;
+}
+
+fn default_callback(self: *Self) void {
     self.triggered = true;
 }
