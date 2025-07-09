@@ -32,11 +32,16 @@ var y_endstop: Endstop = undefined;
 
 var printer: Printer = undefined;
 
+var x_ready = false;
+var y_ready = false;
+
 export fn draw(params: ?*anyopaque) callconv(.c) void {
     _ = params;
-    while (!x_endstop.triggered and !y_endstop.triggered) {}
+    while (!x_ready or !y_ready) {}
 
-    printer.move_2d(.up, 750);
+    printer.printer_homed();
+
+    printer.move_2d(.down, 750);
     printer.move_2d(.right, 750);
 
     printer.move_2d(.up, 250);
@@ -62,6 +67,7 @@ export fn home_x_axis(params: ?*anyopaque) callconv(.c) void {
         x_axis.step();
     }
 
+    x_ready = true;
     os.vTaskDelete(null);
 }
 
@@ -77,6 +83,7 @@ export fn home_y_axis(params: ?*anyopaque) callconv(.c) void {
         y_axis.step();
     }
 
+    y_ready = true;
     os.vTaskDelete(null);
 }
 
@@ -104,7 +111,7 @@ export fn entry() callconv(.c) void {
     _ = os.xTaskCreate(home_y_axis, "home the y axis", 256, pvParameters, 15, pxCreatedTask);
 
     printer = Printer.init(x_axis, y_axis, z_axis, extruder);
-    _ = os.xTaskCreate(draw, "Draw a pretty picture :)", 256, pvParameters, 10, pxCreatedTask);
+    _ = os.xTaskCreate(draw, "Draw a pretty picture :)", 256, pvParameters, 15, pxCreatedTask);
 
     os.vTaskStartScheduler();
     unreachable;

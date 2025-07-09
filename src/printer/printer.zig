@@ -44,12 +44,12 @@ pub fn init(x: Stepper, y: Stepper, z: Stepper, feed: Stepper) Self {
 }
 
 pub fn printer_homed(self: *Self) void {
-    self.x = 0;
-    self.y = 0;
-    self.z = 0;
+    self.curr_x = 0;
+    self.curr_y = 0;
+    self.curr_z = 0;
 
-    self.dir_x = .left;
-    self.dir_y = .up;
+    self.dir_x = .right;
+    self.dir_y = .down;
 
     // TODO: Still don't know
     self.dir_z = undefined;
