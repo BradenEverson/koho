@@ -36,10 +36,8 @@ export fn draw(params: ?*anyopaque) callconv(.c) void {
     _ = params;
     while (!x_endstop.triggered and !y_endstop.triggered) {}
 
-    for (0..750) |_| {
-        x_axis.step();
-        y_axis.step();
-    }
+    printer.move_2d(.up, 750);
+    printer.move_2d(.right, 750);
 
     printer.move_2d(.up, 250);
     printer.move_2d(.left, 250);
