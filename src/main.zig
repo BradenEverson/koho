@@ -38,14 +38,18 @@ export fn draw(params: ?*anyopaque) callconv(.c) void {
 
     printer.printer_homed();
 
-    printer.goto(500, 500);
+    var size: u16 = 1000;
 
-    printer.goto(500, 1000);
-    printer.goto(1000, 1000);
-    printer.goto(1000, 500);
-    printer.goto(500, 500);
+    while (size > 100) {
+        printer.goto(size / 2, size / 2);
 
-    while (true) {}
+        printer.goto(size / 2, size);
+        printer.goto(size, size);
+        printer.goto(size, size / 2);
+        printer.goto(size / 2, size / 2);
+
+        size -= 100;
+    }
 }
 
 export fn home_x_axis(params: ?*anyopaque) callconv(.c) void {
