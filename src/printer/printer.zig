@@ -49,7 +49,7 @@ pub fn printer_homed(self: *Self) void {
     self.curr_z = 0;
 
     self.dir_x = .right;
-    self.dir_y = .down;
+    self.dir_y = .up;
 
     // TODO: Still don't know
     self.dir_z = undefined;
@@ -66,6 +66,12 @@ pub fn move_2d(self: *Self, dir: Direction, steps: u16) void {
             for (0..steps) |_| {
                 self.x.step();
             }
+
+            if (dir == .left) {
+                self.curr_x -|= steps;
+            } else {
+                self.curr_x +|= steps;
+            }
         },
         .up, .down => {
             if (self.dir_y != dir) {
@@ -75,6 +81,12 @@ pub fn move_2d(self: *Self, dir: Direction, steps: u16) void {
 
             for (0..steps) |_| {
                 self.y.step();
+            }
+
+            if (dir == .down) {
+                self.curr_y -|= steps;
+            } else {
+                self.curr_y +|= steps;
             }
         },
     }

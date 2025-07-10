@@ -41,7 +41,7 @@ export fn draw(params: ?*anyopaque) callconv(.c) void {
 
     printer.printer_homed();
 
-    printer.move_2d(.down, 750);
+    printer.move_2d(.up, 750);
     printer.move_2d(.right, 750);
 
     printer.move_2d(.up, 250);
