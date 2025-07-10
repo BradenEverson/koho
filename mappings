@@ -1,7 +1,7 @@
 // Planned GPIO Pins for Stepper Motors and Peripherals
 // Could be nice to just embed and parse this file at comptime :O
 
-[ ] [x-axis stepper]
+[X] [x-axis stepper]
     step: PB8
     dir: PB9
     endstop: PB0
@@ -14,7 +14,6 @@
 [ ] [z-axis stepper]
     step: PC5
     dir: PC6
-    endstop: PB2
 
 [ ] [feed stepper]
     step: PC2

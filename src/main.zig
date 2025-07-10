@@ -24,8 +24,8 @@ const pxCreatedTask: ?*os.TaskHandle_t = null;
 
 var x_axis: Stepper = undefined;
 var y_axis: Stepper = undefined;
-const z_axis: Stepper = undefined;
-const extruder: Stepper = undefined;
+var z_axis: Stepper = undefined;
+var extruder: Stepper = undefined;
 
 var x_endstop: Endstop = undefined;
 var y_endstop: Endstop = undefined;
@@ -93,12 +93,15 @@ export fn EXTI1_IRQHandler() callconv(.c) void {
 export fn entry() callconv(.c) void {
     x_axis = Stepper.init(c.GPIOB, c.GPIO_PIN_8, c.GPIOB, c.GPIO_PIN_9);
     y_axis = Stepper.init(c.GPIOC, c.GPIO_PIN_8, c.GPIOC, c.GPIO_PIN_9);
+    z_axis = Stepper.init(c.GPIOC, c.GPIO_PIN_5, c.GPIOC, c.GPIO_PIN_6);
+    extruder = Stepper.init(c.GPIOC, c.GPIO_PIN_2, c.GPIOC, c.GPIO_PIN_3);
 
     x_endstop = Endstop.init(c.GPIOB, c.GPIO_PIN_0, c.EXTI0_IRQn);
     y_endstop = Endstop.init(c.GPIOB, c.GPIO_PIN_1, c.EXTI1_IRQn);
 
     y_axis.swap_dir();
     x_axis.swap_dir();
+    z_axis.swap_dir();
 
     _ = os.xTaskCreate(home_x_axis, "home the x axis", 256, pvParameters, 15, pxCreatedTask);
     _ = os.xTaskCreate(home_y_axis, "home the y axis", 256, pvParameters, 15, pxCreatedTask);
