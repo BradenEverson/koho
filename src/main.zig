@@ -32,25 +32,18 @@ var y_endstop: Endstop = undefined;
 
 var printer: Printer = undefined;
 
-var x_ready = false;
-var y_ready = false;
-
 export fn draw(params: ?*anyopaque) callconv(.c) void {
     _ = params;
-    while (!x_ready or !y_ready) {}
+    while (!x_endstop.ready or !y_endstop.ready) {}
 
     printer.printer_homed();
 
-    printer.move_2d(.up, 750);
-    printer.move_2d(.right, 750);
+    printer.goto(500, 500);
 
-    printer.move_2d(.up, 250);
-    printer.move_2d(.left, 250);
-    printer.move_2d(.down, 500);
-    printer.move_2d(.right, 500);
-    printer.move_2d(.up, 500);
-    printer.move_2d(.left, 250);
-    printer.move_2d(.down, 250);
+    printer.goto(500, 1000);
+    printer.goto(1000, 1000);
+    printer.goto(1000, 500);
+    printer.goto(500, 500);
 
     while (true) {}
 }
@@ -67,7 +60,7 @@ export fn home_x_axis(params: ?*anyopaque) callconv(.c) void {
         x_axis.step();
     }
 
-    x_ready = true;
+    x_endstop.ready = true;
     os.vTaskDelete(null);
 }
 
@@ -83,7 +76,7 @@ export fn home_y_axis(params: ?*anyopaque) callconv(.c) void {
         y_axis.step();
     }
 
-    y_ready = true;
+    y_endstop.ready = true;
     os.vTaskDelete(null);
 }
 

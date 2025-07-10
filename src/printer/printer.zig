@@ -3,9 +3,9 @@
 const Stepper = @import("../peripherals/stepper.zig");
 const Direction = @import("direction.zig").Direction;
 
-curr_x: u64,
-curr_y: u64,
-curr_z: u64,
+curr_x: u16,
+curr_y: u16,
+curr_z: u16,
 
 dir_x: Direction,
 dir_y: Direction,
@@ -53,6 +53,20 @@ pub fn printer_homed(self: *Self) void {
 
     // TODO: Still don't know
     self.dir_z = undefined;
+}
+
+pub fn goto(self: *Self, x: u16, y: u16) void {
+    if (self.curr_x > x) {
+        self.move_2d(.left, self.curr_x - x);
+    } else {
+        self.move_2d(.right, x - self.curr_x);
+    }
+
+    if (self.curr_y > y) {
+        self.move_2d(.down, self.curr_y - y);
+    } else {
+        self.move_2d(.up, y - self.curr_y);
+    }
 }
 
 pub fn move_2d(self: *Self, dir: Direction, steps: u16) void {

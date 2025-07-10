@@ -17,6 +17,8 @@ port: [*c]c.GPIO_TypeDef,
 pin: u16,
 /// If the endstop has been triggered
 triggered: bool,
+/// If the endstop homing has finished
+ready: bool,
 /// What to do when the endstop is triggered
 callback: *const fn (*Self) void,
 
@@ -37,6 +39,7 @@ pub fn init(port: [*c]c.GPIO_TypeDef, pin: u16, irq_n: c_int) Self {
         .port = port,
         .pin = pin,
         .triggered = false,
+        .ready = false,
         .callback = default_callback,
     };
 }
